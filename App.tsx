@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Ticker, TechnicalData, AnalysisResponse } from './types';
+import { PresetTicker, TechnicalData, AnalysisResponse } from './types';
 import TickerSelector from './components/TickerSelector';
 import TechnicalForm from './components/TechnicalForm';
 import AnalysisDisplay from './components/AnalysisDisplay';
@@ -17,13 +17,32 @@ const initialData: TechnicalData = {
 };
 
 const App: React.FC = () => {
-  const [selectedTicker, setSelectedTicker] = useState<Ticker>(Ticker.BTCUSD);
+  const [selectedTicker, setSelectedTicker] = useState<string>(PresetTicker.BTCUSD);
   const [techData, setTechData] = useState<TechnicalData>(initialData);
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleTickerChange = (ticker: Ticker) => {
+  // Helper to check for user data
+  const hasUserChanges = (data: TechnicalData): boolean => {
+      const hasSR = Object.values(data.supportResistance).some(v => v !== '');
+      const hasSweep = data.weeklySweep.sweep1 !== '' || data.weeklySweep.sweep2 !== '';
+      const hasFvg = Object.values(data.fvgFibs).some(v => v !== '');
+      const hasCandle = Object.values(data.candleFibs).some(v => v !== '');
+      const hasPrice = data.currentPrice !== '';
+      
+      return hasSR || hasSweep || hasFvg || hasCandle || hasPrice;
+  };
+
+  const handleTickerChange = (ticker: string) => {
+    if (ticker === selectedTicker) return;
+
+    if (hasUserChanges(techData)) {
+        if (!window.confirm("You have unsaved changes. Switching tickers will discard your current input (excluding Time Fibs). Continue?")) {
+            return;
+        }
+    }
+
     setSelectedTicker(ticker);
     setAnalysis(null);
     
@@ -64,7 +83,7 @@ const App: React.FC = () => {
                 </div>
             </div>
             <div className="hidden sm:block">
-               <span className="text-xs px-2 py-1 rounded bg-gray-800 text-gray-400 border border-gray-700">v1.2.0</span>
+               <span className="text-xs px-2 py-1 rounded bg-gray-800 text-gray-400 border border-gray-700">v1.2.3</span>
             </div>
         </div>
       </header>
@@ -103,7 +122,7 @@ const App: React.FC = () => {
                     </div>
                 )}
 
-                <AnalysisDisplay response={analysis} />
+                <AnalysisDisplay response={analysis} ticker={selectedTicker} />
             </div>
         </div>
       </main>

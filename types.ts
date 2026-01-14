@@ -1,4 +1,4 @@
-export enum Ticker {
+export enum PresetTicker {
   TOTAL = 'TOTAL (Crypto Total Market Cap)',
   TOTAL3 = 'TOTAL3',
   BTC_D = 'BTC.D',
@@ -7,6 +7,9 @@ export enum Ticker {
   ETHUSD = 'ETHUSD',
   STABLE_D = 'USDT.D + USDC.D'
 }
+
+// Allow Ticker to be a string for custom inputs, but use the enum for presets
+export type Ticker = string;
 
 export type Timeframe = '2h' | '4h' | '1D' | '1W';
 

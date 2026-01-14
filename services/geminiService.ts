@@ -4,7 +4,7 @@ import { Ticker, TechnicalData, AnalysisResponse } from '../types';
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const analyzeTechnicalData = async (
-  ticker: Ticker,
+  ticker: string,
   data: TechnicalData
 ): Promise<AnalysisResponse> => {
   const modelId = 'gemini-3-pro-preview';
@@ -48,28 +48,39 @@ export const analyzeTechnicalData = async (
     TASK:
     Generate a comprehensive analysis report using the provided technicals combined with live market data found via Google Search.
     
-    Use Google Search to specifically find:
-    1. "Hyperliquid whale positions" or general whale/smart money positioning relevant to ${ticker}.
-    2. "X / twitter sentiments" - Recent impactful tweets or sentiment regarding ${ticker}.
+    SEARCH INSTRUCTIONS:
+    1. Search for: "${ticker} whale positions Hyperliquid Binance"
+    2. Search for: "${ticker} twitter sentiment X latest"
+    3. Search for: "top crypto KOLs views on ${ticker} today"
     
+    CRITICAL: In section 3 (Whale Positions), mention any insights for these specific addresses:
+    - https://legacy.hyperdash.com/trader/0x94d3735543ecb3d339064151118644501c933814
+    - https://legacy.hyperdash.com/trader/0x152e41f0b83e6cad4b5dc730c1d6279b7d67c9dc
+    - https://legacy.hyperdash.com/trader/0x0ddf9bae2af4b874b96d287a5ad42eb47138a902
+    
+    CRITICAL: Section 4 MUST be a detailed summary of Twitter/X sentiment. Use recent tweets, hashtag trends, and KOL (Key Opinion Leader) opinions found in search.
+
     OUTPUT FORMAT (Markdown):
     
     ## ${ticker} Technical Analysis
     
     ### 1. 2H & 4H Analysis (Lower Time Frame)
-    *Synthesize the 2h, 4h Support/Resistance, FVG Fibs, and Candle Fibs. Identify immediate trends, entries, or invalidation points.*
+    *Synthesize the 2h, 4h levels. Identify immediate trends and entries.*
     
     ### 2. High Time Frame Analysis (Daily & Weekly)
-    *Synthesize Daily/Weekly S/R, Weekly Sweeps, and major Fib levels. Determine the macro bias.*
+    *Synthesize macro S/R and Weekly Sweeps. Determine the macro bias.*
     
     ### 3. Hyperliquid Whale Positions & Smart Money
-    *Summarize findings from search regarding Open Interest (OI), funding rates, or whale movements on Hyperliquid/Binance.*
+    *Summarize findings regarding whale movements and Hyperdash trader links.*
     
-    ### 4. Market Sentiment (X / Twitter)
-    *Summarize current social sentiment. Bullish/Bearish? What are the KOLs saying?*
+    ### 4. Market Sentiment (Twitter/X & KOLs)
+    *Provide a robust summary of social sentiment from Twitter/X. Is the "CT" (Crypto Twitter) crowd bullish or bearish? What are the specific narratives or fears circulating right now?*
     
     ### 5. Final Summary
-    *Conclusive actionable bias (Long/Short/Neutral) with key levels to watch based on the Time Vertical Fibs and Price Levels.*
+    *Conclusive actionable bias with key levels and timing pivots.*
+
+    ### 6. X Post Draft
+    *Write a short, easy-to-understand summary (max 270 chars) specifically describing the 2H Timeframe structure. Mention $${ticker} and the direction (Long/Short). Do not use external links or hashtags other than the ticker.*
   `;
 
   try {
