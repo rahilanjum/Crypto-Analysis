@@ -7,10 +7,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21' # Updated to 21 for Capacitor 7 support
           distribution: 'temurin'
 
       - name: Install Dependencies
@@ -24,7 +24,7 @@ jobs:
       - name: Setup Capacitor
         run: |
           npm install @capacitor/cli @capacitor/core @capacitor/android @capacitor/assets
-          # FIX: Changed 'void' to 'v0id' to avoid Java reserved word error
+          # Created config with 'v0id' to avoid Java keyword errors
           echo "import { CapacitorConfig } from '@capacitor/cli'; const config: CapacitorConfig = { appId: 'com.v0id.cryptoapp', appName: 'Crypto-Analysis', webDir: 'dist' }; export default config;" > capacitor.config.ts
           npx cap add android || true
 
