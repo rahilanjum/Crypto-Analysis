@@ -24,7 +24,7 @@ jobs:
       - name: Setup Capacitor
         run: |
           npm install @capacitor/cli @capacitor/core @capacitor/android @capacitor/assets
-          # Create fresh config - Using v0id to avoid Java reserved word errors
+          # Create fresh config - Using v0id to avoid Java reserved word error
           echo "import { CapacitorConfig } from '@capacitor/cli'; const config: CapacitorConfig = { appId: 'com.v0id.cryptoapp', appName: 'Crypto-Analyst', webDir: 'dist' }; export default config;" > capacitor.config.ts
           
           # INITIALIZE AND FIX DEPENDENCIES
@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Crypto-Analysis-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/ca.apk
