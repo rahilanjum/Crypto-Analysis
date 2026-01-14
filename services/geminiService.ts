@@ -1,10 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { Ticker, TechnicalData, AnalysisResponse } from '../types';
 
-
-
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY; 
-const genAI = new GoogleGenerativeAI(API_KEY);
+const ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY });
 
 
 export const analyzeTechnicalData = async (
