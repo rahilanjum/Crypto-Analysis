@@ -24,9 +24,15 @@ jobs:
       - name: Setup Capacitor
         run: |
           npm install @capacitor/cli @capacitor/core @capacitor/android @capacitor/assets
-          # Created config with 'v0id' to avoid Java keyword errors
-          echo "import { CapacitorConfig } from '@capacitor/cli'; const config: CapacitorConfig = { appId: 'com.v0id.cryptoapp', appName: 'Crypto-Analysis', webDir: 'dist' }; export default config;" > capacitor.config.ts
+          # Create fresh config - Using v0id to avoid Java reserved word errors
+          echo "import { CapacitorConfig } from '@capacitor/cli'; const config: CapacitorConfig = { appId: 'com.v0id.cryptoapp', appName: 'Crypto-Analyst', webDir: 'dist' }; export default config;" > capacitor.config.ts
+          
+          # INITIALIZE AND FIX DEPENDENCIES
           npx cap add android || true
+          
+          # This command injects a "force" rule into the Android build files 
+          # to stop the Duplicate Class error
+          sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22") { because("merged into stdlib") }\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22") { because("merged into stdlib") }\n    }' android/app/build.gradle          
 
       - name: Generate Icons
         run: npx capacitor-assets generate --android
