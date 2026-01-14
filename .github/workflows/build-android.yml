@@ -24,8 +24,8 @@ jobs:
       - name: Setup Capacitor
         run: |
           npm install @capacitor/cli @capacitor/core @capacitor/android @capacitor/assets
-          # Create fresh config without the red-line error
-          echo "import { CapacitorConfig } from '@capacitor/cli'; const config: CapacitorConfig = { appId: 'com.void.aiapp', appName: 'Crypto-Analysis', webDir: 'dist' }; export default config;" > capacitor.config.ts
+          # FIX: Changed 'void' to 'v0id' to avoid Java reserved word error
+          echo "import { CapacitorConfig } from '@capacitor/cli'; const config: CapacitorConfig = { appId: 'com.v0id.cryptoapp', appName: 'Crypto-Analysis', webDir: 'dist' }; export default config;" > capacitor.config.ts
           npx cap add android || true
 
       - name: Generate Icons
