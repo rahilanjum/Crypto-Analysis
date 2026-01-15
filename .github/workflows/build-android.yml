@@ -13,31 +13,34 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Install Project Dependencies
+        run: |
+          npm install
+          # Explicitly install Capacitor CLI to avoid "command not found"
+          npm install @capacitor/cli @capacitor/core @capacitor/android
 
       - name: Build Web Project (Vite)
         env:
-          # CRITICAL: This bakes the key into the APK's JavaScript code
+          # This bakes your Secret into the JavaScript
           VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run build
 
-      - name: Initialize Capacitor Android
+      - name: Initialize Android Platform
         run: |
-          # 1. Ensure the android platform is added
-          npx cap add android || true
-          
-          # 2. Sync the 'dist' folder into the Android project
+          # Create the android folder if it's missing
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
           npx cap sync android
 
       - name: Apply Kotlin Duplicate Class Fix
         run: |
-          # Robust check to ensure build.gradle exists before running sed
-          FILE="android/app/build.gradle"
-          if [ -f "$FILE" ]; then
-            sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22") { because("merged into stdlib") }\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22") { because("merged into stdlib") }\n    }' "$FILE"
+          # Use a robust path check to prevent the 'sed' error
+          BUILD_GRADLE="android/app/build.gradle"
+          if [ -f "$BUILD_GRADLE" ]; then
+            sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22") { because("merged") }\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22") { because("merged") }\n    }' "$BUILD_GRADLE"
           else
-            echo "Error: $FILE not found. Initialization likely failed."
+            echo "ERROR: $BUILD_GRADLE not found! Initialization failed."
             exit 1
           fi
 
