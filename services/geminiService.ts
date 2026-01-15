@@ -1,7 +1,25 @@
 import { GoogleGenAI } from "@google/genai";
 import { Ticker, TechnicalData, AnalysisResponse } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// VITE_ prefix is required for the key to be bundled into the APK
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+if (!apiKey) {
+  console.error("API Key is missing! The AI will not respond.");
+}
+
+const ai = new GoogleGenAI({ apiKey });
+
+export const analyzeCrypto = async (prompt: string) => {
+  try {
+    const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (error) {
+    console.error("AI Analysis Failed:", error);
+    return "Check API Connection";
+  }
+};
 
 export const analyzeTechnicalData = async (
   ticker: string,
