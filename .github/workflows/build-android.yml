@@ -18,20 +18,34 @@ jobs:
 
       - name: Build Web Project (Vite)
         env:
-          # This maps your Secret to the VITE_ prefix Vite needs
+          # CRITICAL: This bakes the key into the APK's JavaScript code
           VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run build
 
-      - name: Setup Capacitor & Fix Kotlin
+      - name: Initialize Capacitor Android
         run: |
+          # 1. Ensure the android platform is added
           npx cap add android || true
-          # FIX: Align Kotlin versions to resolve 'Duplicate class' errors
-          sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22") { because("merged into stdlib") }\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22") { because("merged into stdlib") }\n    }' android/app/build.gradle
-
-      - name: Sync and Build APK
-        run: |
+          
+          # 2. Sync the 'dist' folder into the Android project
           npx cap sync android
-          cd android && ./gradlew assembleDebug
+
+      - name: Apply Kotlin Duplicate Class Fix
+        run: |
+          # Robust check to ensure build.gradle exists before running sed
+          FILE="android/app/build.gradle"
+          if [ -f "$FILE" ]; then
+            sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22") { because("merged into stdlib") }\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22") { because("merged into stdlib") }\n    }' "$FILE"
+          else
+            echo "Error: $FILE not found. Initialization likely failed."
+            exit 1
+          fi
+
+      - name: Build APK with Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
