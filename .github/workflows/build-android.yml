@@ -1,0 +1,40 @@
+name: Build Android APK
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web Project (Vite)
+        env:
+          # This maps your Secret to the VITE_ prefix Vite needs
+          VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run build
+
+      - name: Setup Capacitor & Fix Kotlin
+        run: |
+          npx cap add android || true
+          # FIX: Align Kotlin versions to resolve 'Duplicate class' errors
+          sed -i '/dependencies {/a \    constraints {\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22") { because("merged into stdlib") }\n        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22") { because("merged into stdlib") }\n    }' android/app/build.gradle
+
+      - name: Sync and Build APK
+        run: |
+          npx cap sync android
+          cd android && ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Crypto-Analysis-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
