@@ -1,14 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 import { Ticker, TechnicalData, AnalysisResponse } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.VITE_GEMINI_API_KEY });
+export const analyzeCrypto = async (prompt: string) => {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("API Key not found in APK bundle. Check build settings.");
+  }
 
-
-export const analyzeTechnicalData = async (
-  ticker: string,
-  data: TechnicalData
-): Promise<AnalysisResponse> => {
-  const modelId = 'gemini-3-pro-preview';
+  const ai = new GoogleGenAI({ apiKey });
+  // Proceed with analysis...
+};
 
   const prompt = `
     Act as a world-class Cryptocurrency Technical Analyst. 
