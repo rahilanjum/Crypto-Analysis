@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { Ticker, TechnicalData, AnalysisResponse } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 export const analyzeTechnicalData = async (
   ticker: string,
