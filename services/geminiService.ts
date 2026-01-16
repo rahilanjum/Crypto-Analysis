@@ -46,8 +46,8 @@ export const analyzeTechnicalData = async (
       .filter(Boolean) || [];
 
     return {
-      markdown: response.candidates?.[0]?.content?.parts?.[0]?.text || "Analysis failed.",
-      groundingSources,
+      markdown: response.text || "Analysis failed.",
+      groundingSources: response.groundingSources || [],
     };
   } catch (error) {
     console.error("Analysis Error:", error);
