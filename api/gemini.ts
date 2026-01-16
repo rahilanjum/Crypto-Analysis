@@ -20,7 +20,26 @@ export default async function handler(req: any, res: any) {
     );
 
     const data = await response.json();
-    return res.status(200).json(data);
+
+    // 🔍 Debug in logs
+    console.log("Gemini Raw Response:", JSON.stringify(data));
+
+    // ✅ Safely extract text
+    const text =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Analysis failed.";
+
+    const groundingSources =
+      data?.candidates?.[0]?.groundingMetadata?.groundingChunks
+        ?.map((chunk: any) =>
+          chunk.web ? { title: chunk.web.title, uri: chunk.web.uri } : null
+        )
+        .filter(Boolean) || [];
+
+    return res.status(200).json({
+      text,
+      groundingSources,
+    });
   } catch (error) {
     console.error("Server Gemini Error:", error);
     return res.status(500).json({ error: "Gemini request failed" });
